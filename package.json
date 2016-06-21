@@ -1,0 +1,35 @@
+{
+  "name": "noteserver",
+  "version": "0.0.1",
+  "description": "A very simple note server",
+  "main": "wikiServer.js",
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "co-monk": "",
+    "koa": "^0.19.1",
+    "koa-bodyparser": "^1.5.0",
+    "koa-route": "^2.4.1",
+    "mongodb": "^1.4.40",
+    "mongoskin": "^1.3.20",
+    "mz": ""
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "iojs noteServer.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ccckmit/noteServer.git"
+  },
+  "keywords": [
+    "koa",
+    "SPA",
+    "blog"
+  ],
+  "author": "ccckmit",
+  "bugs": {
+    "url": "https://github.com/ccckmit/noteServer/issues"
+  },
+  "homepage": "https://github.com/ccckmit/noteServer"
+}

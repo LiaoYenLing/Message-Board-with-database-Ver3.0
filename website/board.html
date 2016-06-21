@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="Leo.ico" rel="icon">
+    <title>Message Board</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    a { color: darkmagenta } 
+    body {padding-top: 60px;
+          padding-bottom: 20px;}
+    body {background-image: url(yulyulk.png); 
+          background-repeat:no-repeat;
+          background-position: right top;
+          background-size:750px 687.5px;}
+</style>
+<style>
+body {
+  padding-top: 70px;
+  padding-bottom: 20px;
+}
+</style>
+</head>
+  
+<body onload="init()">
+ <nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+   <div class="navbar-header">
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+     <span class="sr-only">Toggle navigation</span>
+     <span class="icon-bar"></span>
+     <span class="icon-bar"></span>
+     <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="#" style="font-family:fantasy;font-size:28px;">★ Message Board ★</a>
+   </div>
+   <div id="navbar" class="navbar-collapse collapse"></div>
+  </div>
+ </nav>
+  <div class="container">
+    
+   <audio controls autoplay>
+    <source src="http://s25.youmaker.com/other/2011/9-28/mp352208823866e976026b5411fbe8f985a2637d199001.mp3" type="audio/mpeg">
+   </audio>
+   
+  <div class="row">
+  <div class="form-group">
+   <input id="filepath" type="hidden" class="form-control" placeholder="filepath" aria-describedby="basic-addon1">
+   <form class="form-signin">
+    <br/><button class="btn btn-danger" type="button" onclick="list()" style="background-color:#ff3399;border:#ff3399;font-family:cursive;font-size:20px;">Storage Notes</button><br/><br/>
+         <button class="btn btn-danger" type="button" onclick="newNote()" style="background-color:#ff0066;border:#ff0066;font-family:cursive;font-size:20px;">New Notes</button>    
+   </form>
+  </div>
+  </div>
+  <!--<span style="font-family:sans-serif;">Date<input type="date" id="date" class="form-control" placeholder="日期" required autofocus>
+      <span style="font-family:sans-serif;">Time</br><input type="time" id="time" class="form-control" placeholder="時間" required autofocus></br>-->
+  <div id="panelList" class="tab-pane panel" style="width:400px"></div>
+  <div id="panelEdit" class="tab-pane panel" style="width:400px;height:340px;">
+    <span style="font-family:sans-serif;">Event<br/><input id="editTitle" type="text" class="form-control"></span><br/>
+    <span style="font-family:sans-serif;">Date<input id="editDate" type="date" class="form-control" placeholder="日期"><br/>
+    <span style="font-family:sans-serif;">Time<input id="editTime" type="time" class="form-control" placeholder="時間"><br/>
+    <span style="font-family:sans-serif;">Details<textarea id="editBody" class="form-control"></textarea></span><br/>
+   <button class="btn btn-success" onclick="save()" style="background-color:#cc0066;border:#cc0066;font-family:cursive;font-size:20px;">Save</button>
+  </div>
+  <div id="panelNew" class="tab-pane panel" style="width:400px;height:340px;">
+    <span style="font-family:sans-serif;;">Event<br/><input id="newTitle" type="text" class="form-control"></span><br/>
+    <span style="font-family:sans-serif;">Date<input id="newDate" type="date" class="form-control" placeholder="日期"><br/>
+    <span style="font-family:sans-serif;">Time<input id="newTime" type="time" class="form-control" placeholder="時間"><br/>
+    <span style="font-family:sans-serif;">Details<textarea id="newBody" class="form-control"></textarea></span><br/>
+   <button class="btn btn-success" onclick="add()" style="background-color:#F11368;border:#F11368;font-family:cursive;font-size:20px;">Add</button>
+  </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<footer>
+  </br><p>&copy; LYL</p>
+</footer>
+
+<script>
+$('.panel').css( "display", "none");
+
+Server = {
+  timeout : 4000
+};
+
+Server.save=function(file, text, date, time) {
+  $.ajax({
+    type: "POST",
+    url: "/note/"+file,
+    timeout: this.timeout,
+    data: { text: text, date: date, time: time }
+    })
+  .done(function(data) {
+    alert( "Finish~~~");
+  })
+  .fail(function() {
+    alert( "Fail!!!" );
+  });
+}
+
+Server.load=function(file) {
+  return $.ajax({
+    type: "GET",
+    url: "/note/"+file,
+    timeout: this.timeout,
+    data: {}
+  });
+}
+
+function init() {
+  list();
+}
+
+function switchPanel(name) {
+  $('.panel').css( "display", "none");
+  $('#'+name).css( "display", "block");
+}
+
+function list() {
+  switchPanel('panelList');
+  $.ajax({
+    type: "GET",
+    url: "/list",
+    timeout: this.timeout,
+    data: {}
+  })
+  .done(function(data) {
+    var notes = JSON.parse(data);
+		$('#panelList').empty();
+		$('#panelList').append("<ol>");
+    for (var i in notes) {
+      $('#panelList').append('<li style="color:#cc3399;"><a href="javascript:edit(\''+notes[i]._id+'\')">'+notes[i].title+"</a></li>")
+    }
+		$('#panelList').append("</ol>");
+  });
+}
+
+var noteID;
+
+function edit(id) {
+  switchPanel('panelEdit');
+	noteID = id;
+  $.ajax({
+    type: "GET",
+    url: "/note/"+id,
+    timeout: this.timeout,
+    data: {}
+  })
+  .done(function(data) {
+    var note = JSON.parse(data);
+    $('#editTitle').val(note.title);
+    $('#editBody').val(note.body);
+    $('#editDate').val(note.date);
+    $('#editTime').val(note.time);
+  });
+}
+
+function save() {
+  var title = $('#editTitle').val();
+  var body  = $('#editBody').val();
+  var date  = $('#editDate').val();
+  var time  = $('#editTime').val();
+  $.ajax({
+    type: "POST",
+    url: "/note/"+noteID,
+    timeout: this.timeout,
+    data: {
+      title:title,
+			body:body,
+      date:date,
+      time:time,
+    }
+  })
+  .done(function(data) {
+	  alert('Finish!');
+	});
+}
+
+function newNote() {
+  switchPanel('panelNew');
+  $('#editTitle').val('');
+  $('#editBody').val('');
+  $('#editDate').val('');
+  $('#editTime').val('');
+}
+
+function add() {
+  var title = $('#newTitle').val();
+  var body  = $('#newBody').val();
+  var date  = $('#newDate').val();
+  var time  = $('#newTime').val();
+  $.ajax({
+    type: "POST",
+    url: "/new",
+    timeout: this.timeout,
+    data: {
+      title:title,
+			body:body,
+      date:date,
+      time:time,
+    }
+  })
+  .done(function(data) {
+	  alert('Finish~');
+		list();
+	});
+}
+</script>
+</body>
+</html>
